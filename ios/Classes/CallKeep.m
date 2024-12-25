@@ -115,12 +115,8 @@ static NSObject<CallKeepPushDelegate>* _delegate;
     } else if([@"reportUpdatedCall" isEqualToString:method]){
         [self reportUpdatedCall:argsMap[@"uuid"] contactIdentifier:argsMap[@"callerName"]];
         result(nil);
-    } else if ([@"setAudioRoute" isEqualToString:method]) {
-        BOOL toSpeaker = [argsMap[@"toSpeaker"] boolValue];
-        [self setAudioRouteToSpeaker:toSpeaker];
-        result(nil);
     } else if ([method isEqualToString:@"toggleSpeaker"]) {
-        BOOL speakerOn = [args[@"speakerOn"] boolValue];
+        BOOL speakerOn = [argsMap[@"speakerOn"] boolValue];
         [self toggleSpeaker:speakerOn];
         result(nil);
     } else {
