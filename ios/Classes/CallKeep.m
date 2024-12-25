@@ -945,17 +945,14 @@ continueUserActivity:(NSUserActivity *)userActivity
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     NSError *error = nil;
     
-    // Set the audio session category
     [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
                   withOptions:AVAudioSessionCategoryOptionAllowBluetooth
                         error:&error];
-    
     if (error) {
         NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error setting category: %@", error);
         return;
     }
     
-    // Set the audio route
     if (toSpeaker) {
         [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
     } else {
@@ -966,7 +963,6 @@ continueUserActivity:(NSUserActivity *)userActivity
         NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error overriding audio port: %@", error);
     }
     
-    // Activate the audio session
     [audioSession setActive:YES error:&error];
     
     if (error) {

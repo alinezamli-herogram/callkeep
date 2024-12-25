@@ -21,7 +21,6 @@ class FlutterCallkeep extends EventManager {
   static final FlutterCallkeep _instance = FlutterCallkeep._internal();
   static const MethodChannel _channel = MethodChannel('FlutterCallKeep.Method');
   static const MethodChannel _event = MethodChannel('FlutterCallKeep.Event');
-  static const MethodChannel _channelAudio = MethodChannel('call_magnus/audio');
 
   Future<bool> Function()? _showAlertDialog;
 
@@ -441,11 +440,9 @@ class FlutterCallkeep extends EventManager {
   }
 
   /// Toggle audio route between speaker and earpiece.
-  static Future<void> toggleAudioRoute(bool toSpeaker) async {
-    try {
-      await _channelAudio.invokeMethod('setAudioRoute', {'toSpeaker': toSpeaker});
-    } catch (e, s) {
-      debugPrint('Failed to toggle audio route: $e $s');
-    }
+  Future<void> setAudioRouteToSpeaker(bool toSpeaker) async {
+    return _channel.invokeMethod('setAudioRouteToSpeaker', {
+      'toSpeaker': toSpeaker,
+    });
   }
 }
