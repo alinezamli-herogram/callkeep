@@ -38,6 +38,12 @@ static NSObject<CallKeepPushDelegate>* _delegate;
 #endif
     if (self = [super init]) {
         _delayedEvents = [NSMutableArray array];
+
+        // ADD THE OBSERVER
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleAudioSessionRouteChange:)
+                                                     name:AVAudioSessionRouteChangeNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -935,6 +941,48 @@ continueUserActivity:(NSUserActivity *)userActivity
         AVAudioSessionInterruptionOptionKey: [NSNumber numberWithInt:AVAudioSessionInterruptionOptionShouldResume]
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionInterruptionNotification object:nil userInfo:userInfo];
+}
+
+- (void)handleAudioSessionRouteChange:(NSNotification *)notification
+{
+    // The userInfo dictionary often contains details about why the route changed
+    NSDictionary *userInfo = notification.userInfo;
+    AVAudioSessionRouteChangeReason reason =
+        [userInfo[AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];
+
+    // Grab the current route
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    AVAudioSessionRouteDescription *currentRoute = audioSession.currentRoute;
+    AVAudioSessionPortDescription *output = currentRoute.outputs.firstObject;
+    NSString *portType = output.portType;  // e.g. "Speaker", "Receiver", "Headphones", etc.
+
+    NSLog(@"[CallKeep][handleAudioSessionRouteChange] reason=%lu, portType=%@",
+          (unsigned long)reason, portType);
+
+    /*
+      Some possible values for portType:
+      - AVAudioSessionPortBuiltInSpeaker  => "Speaker"
+      - AVAudioSessionPortBuiltInReceiver => "Receiver" (earpiece)
+      - AVAudioSessionPortBluetoothA2DP   => "Bluetooth"
+      - AVAudioSessionPortHeadphones      => "Headphones"
+      etc.
+    */
+
+    /*
+     You can detect specific transitions. For example:
+     - If the user changed from speaker -> receiver, portType would be "Receiver".
+     - If the user changed to speaker, portType would be "Speaker".
+     */
+
+    // Optional: If you need to pass this event to Flutter (Dart side), do something like:
+   
+    if (self.eventChannel != nil) {
+        // Provide some event name, e.g. "onAudioRouteChanged"
+        // and a small payload describing the new route
+        [self.eventChannel invokeMethod:@"onAudioRouteChanged"
+                              arguments:@{@"portType": portType}];
+    }
+   
 }
 
 @end

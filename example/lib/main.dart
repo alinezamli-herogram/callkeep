@@ -38,22 +38,17 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) {
   var callUUID = data['uuid'] ?? const Uuid().v4();
   var hasVideo = data['has_video'] == "true";
 
-  _callKeep.on<CallKeepPerformAnswerCallAction>(
-      (CallKeepPerformAnswerCallAction event) {
-    logger.d(
-        'backgroundMessage: CallKeepPerformAnswerCallAction ${event.callData.callUUID}');
+  _callKeep.on<CallKeepPerformAnswerCallAction>((CallKeepPerformAnswerCallAction event) {
+    logger.d('backgroundMessage: CallKeepPerformAnswerCallAction ${event.callData.callUUID}');
     Timer(const Duration(seconds: 1), () {
-      logger.d(
-          '[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
+      logger.d('[setCurrentCallActive] $callUUID, callerId: $callerId, callerName: $callerName');
       _callKeep.setCurrentCallActive(callUUID);
     });
     //_callKeep.endCall(event.callUUID);
   });
 
-  _callKeep
-      .on<CallKeepPerformEndCallAction>((CallKeepPerformEndCallAction event) {
-    logger
-        .d('backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
+  _callKeep.on<CallKeepPerformEndCallAction>((CallKeepPerformEndCallAction event) {
+    logger.d('backgroundMessage: CallKeepPerformEndCallAction ${event.callUUID}');
   });
   if (!_callKeepInited) {
     _callKeep.setup(
@@ -63,10 +58,7 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) {
           'appName': 'CallKeepDemo',
         },
         'android': {
-          'additionalPermissions': [
-            'android.permission.CALL_PHONE',
-            'android.permission.READ_PHONE_NUMBERS'
-          ],
+          'additionalPermissions': ['android.permission.CALL_PHONE', 'android.permission.READ_PHONE_NUMBERS'],
           'foregroundService': {
             'channelId': 'com.example.call-kit-test',
             'channelName': 'callKitTest',
@@ -198,8 +190,7 @@ class MyAppState extends State<HomePage> {
   }
 
   Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
-    logger
-        .d('[didPerformDTMFAction] ${event.callUUID}, digits: ${event.digits}');
+    logger.d('[didPerformDTMFAction] ${event.callUUID}, digits: ${event.digits}');
   }
 
   Future<void> didReceiveStartCallAction(
@@ -215,11 +206,9 @@ class MyAppState extends State<HomePage> {
     setState(() {
       calls[callUUID] = call;
     });
-    logger
-        .d('[didReceiveStartCallAction] $callUUID, number: ${callData.handle}');
+    logger.d('[didReceiveStartCallAction] $callUUID, number: ${callData.handle}');
 
-    _callKeep.startCall(
-        uuid: callUUID, handle: call.number, callerName: call.number);
+    _callKeep.startCall(uuid: callUUID, handle: call.number, callerName: call.number);
 
     Timer(const Duration(seconds: 1), () {
       logger.d('[setCurrentCallActive] $callUUID, number: ${callData.handle}');
@@ -227,8 +216,7 @@ class MyAppState extends State<HomePage> {
     });
   }
 
-  Future<void> didPerformSetMutedCallAction(
-      CallKeepDidPerformSetMutedCallAction event) async {
+  Future<void> didPerformSetMutedCallAction(CallKeepDidPerformSetMutedCallAction event) async {
     final callUUID = event.callUUID;
     if (callUUID == null) {
       logger.e("Tried to mute call but callUUID is null");
@@ -236,14 +224,12 @@ class MyAppState extends State<HomePage> {
     }
     final number = calls[callUUID]?.number ?? "No Number";
     final muted = event.muted ?? false;
-    logger.d(
-        '[didPerformSetMutedCallAction] $callUUID, number: $number ($muted)');
+    logger.d('[didPerformSetMutedCallAction] $callUUID, number: $number ($muted)');
 
     setCallMuted(callUUID, muted);
   }
 
-  Future<void> didToggleHoldCallAction(
-      CallKeepDidToggleHoldAction event) async {
+  Future<void> didToggleHoldCallAction(CallKeepDidToggleHoldAction event) async {
     final callUUID = event.callUUID;
     if (callUUID == null) {
       logger.e("Tried to hold call but callUUID is null");
@@ -279,11 +265,9 @@ class MyAppState extends State<HomePage> {
     final String number = calls[callUUID]?.number ?? "No Number";
     // Workaround because Android doesn't display well displayName, se we have to switch ...
     if (isIOS) {
-      _callKeep.updateDisplay(
-          uuid: callUUID, callerName: 'New Name', handle: number);
+      _callKeep.updateDisplay(uuid: callUUID, callerName: 'New Name', handle: number);
     } else {
-      _callKeep.updateDisplay(
-          uuid: callUUID, callerName: number, handle: 'New Name');
+      _callKeep.updateDisplay(uuid: callUUID, callerName: number, handle: 'New Name');
     }
 
     logger.d('[updateDisplay: $number] $callUUID');
@@ -305,8 +289,7 @@ class MyAppState extends State<HomePage> {
     if (!hasPhoneAccount) {
       await _callKeep.hasDefaultPhoneAccount(<String, dynamic>{
         'alertTitle': 'Permissions required',
-        'alertDescription':
-            'This application needs to access your phone accounts',
+        'alertDescription': 'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
         'foregroundService': {
@@ -319,8 +302,7 @@ class MyAppState extends State<HomePage> {
     }
 
     logger.d('[displayIncomingCall] $callUUID number: $number');
-    _callKeep.displayIncomingCall(
-        uuid: callUUID, handle: number, handleType: 'number', hasVideo: false);
+    _callKeep.displayIncomingCall(uuid: callUUID, handle: number, handleType: 'number', hasVideo: false);
   }
 
   void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {
@@ -340,6 +322,10 @@ class MyAppState extends State<HomePage> {
     logger.d('[onPushKitToken] token => ${event.token}');
   }
 
+  void onAudioRouteChanged(AudioRouteChanged event) {
+    logger.d('[onAudioRouteChanged] => ${event.portType}');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -348,10 +334,10 @@ class MyAppState extends State<HomePage> {
     _callKeep.on<CallKeepDidPerformDTMFAction>(didPerformDTMFAction);
     _callKeep.on<CallKeepDidReceiveStartCallAction>(didReceiveStartCallAction);
     _callKeep.on<CallKeepDidToggleHoldAction>(didToggleHoldCallAction);
-    _callKeep
-        .on<CallKeepDidPerformSetMutedCallAction>(didPerformSetMutedCallAction);
+    _callKeep.on<CallKeepDidPerformSetMutedCallAction>(didPerformSetMutedCallAction);
     _callKeep.on<CallKeepPerformEndCallAction>(endCall);
     _callKeep.on<CallKeepPushKitToken>(onPushKitToken);
+    _callKeep.on<AudioRouteChanged>(onAudioRouteChanged);
 
     _callKeep.setup(
       showAlertDialog: () => showDialog<bool>(
@@ -360,8 +346,7 @@ class MyAppState extends State<HomePage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Permissions Required'),
-            content: const Text(
-                'This application needs to access your phone accounts'),
+            content: const Text('This application needs to access your phone accounts'),
             actions: <Widget>[
               TextButton(
                 child: const Text('Cancel'),
@@ -380,10 +365,7 @@ class MyAppState extends State<HomePage> {
           'appName': 'CallKeepDemo',
         },
         'android': {
-          'additionalPermissions': [
-            'android.permission.CALL_PHONE',
-            'android.permission.READ_PHONE_NUMBERS'
-          ],
+          'additionalPermissions': ['android.permission.CALL_PHONE', 'android.permission.READ_PHONE_NUMBERS'],
           'foregroundService': {
             'channelId': 'com.example.call-kit-test',
             'channelName': 'callKitTest',
@@ -424,8 +406,7 @@ class MyAppState extends State<HomePage> {
         );
 
         if (message.notification != null) {
-          print(
-              'Message also contained a notification: ${message.notification}');
+          print('Message also contained a notification: ${message.notification}');
         }
       });
       FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
@@ -436,8 +417,7 @@ class MyAppState extends State<HomePage> {
     return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: calls.entries
-            .map((MapEntry<String, Call> item) =>
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            .map((MapEntry<String, Call> item) => Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                   Text('number: ${item.value.number}'),
                   Text('uuid: ${item.key}'),
                   Row(
