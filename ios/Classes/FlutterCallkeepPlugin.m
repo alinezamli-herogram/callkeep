@@ -75,4 +75,20 @@ continueUserActivity:(NSUserActivity *)userActivity
     return NO;
 }
 
+- (BOOL)application:(UIApplication *)application
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    FlutterMethodChannel* channel = [[FlutterMethodChannel alloc] initWithName:@"call_magnus/audio"
+                                                               binaryMessenger:(FlutterViewController*)self.window.rootViewController.binaryMessenger];
+    [channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
+        if ([@"setAudioRoute" isEqualToString:call.method]) {
+            BOOL toSpeaker = [call.arguments[@"toSpeaker"] boolValue];
+            [self setAudioRouteToSpeaker:toSpeaker];
+            result(nil);
+        } else {
+            result(FlutterMethodNotImplemented);
+        }
+    }];
+    return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
 @end

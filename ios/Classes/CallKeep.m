@@ -115,6 +115,10 @@ static NSObject<CallKeepPushDelegate>* _delegate;
     } else if([@"reportUpdatedCall" isEqualToString:method]){
         [self reportUpdatedCall:argsMap[@"uuid"] contactIdentifier:argsMap[@"callerName"]];
         result(nil);
+    } else if ([@"setAudioRoute" isEqualToString:method]) {
+        BOOL toSpeaker = [argsMap[@"toSpeaker"] boolValue];
+        [self setAudioRouteToSpeaker:toSpeaker];
+        result(nil);
     } else {
         return NO;
     }
@@ -935,6 +939,39 @@ continueUserActivity:(NSUserActivity *)userActivity
         AVAudioSessionInterruptionOptionKey: [NSNumber numberWithInt:AVAudioSessionInterruptionOptionShouldResume]
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionInterruptionNotification object:nil userInfo:userInfo];
+}
+
+- (void)setAudioRouteToSpeaker:(BOOL)toSpeaker {
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    NSError *error = nil;
+    
+    // Set the audio session category
+    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+                  withOptions:AVAudioSessionCategoryOptionAllowBluetooth
+                        error:&error];
+    
+    if (error) {
+        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error setting category: %@", error);
+        return;
+    }
+    
+    // Set the audio route
+    if (toSpeaker) {
+        [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+    } else {
+        [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+    }
+    
+    if (error) {
+        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error overriding audio port: %@", error);
+    }
+    
+    // Activate the audio session
+    [audioSession setActive:YES error:&error];
+    
+    if (error) {
+        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error activating audio session: %@", error);
+    }
 }
 
 @end
