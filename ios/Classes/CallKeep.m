@@ -979,7 +979,7 @@ continueUserActivity:(NSUserActivity *)userActivity
     if (self.eventChannel != nil) {
         // Provide some event name, e.g. "onAudioRouteChanged"
         // and a small payload describing the new route
-        [self.eventChannel invokeMethod:@"onAudioRouteChanged"
+        [self.eventChannel invokeMethod:onAudioRouteChanged
                               arguments:@{@"portType": portType}];
     }
    

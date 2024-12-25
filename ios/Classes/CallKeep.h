@@ -30,6 +30,7 @@ static NSString *_Nonnull const CallKeepDidLoadWithEvents = @"CallKeepDidLoadWit
 static NSString *_Nonnull const CallKeepPushKitToken = @"CallKeepPushKitToken";
 static NSString *_Nonnull const CallKeepActionAnswer = @"CallKeepActionAnswer";
 static NSString *_Nonnull const CallKeepActionEnd = @"CallKeepActionEnd";
+static NSString *_Nonnull const onAudioRouteChanged = @"onAudioRouteChanged";
 
 @interface CallKeep: NSObject<CXProviderDelegate, PKPushRegistryDelegate>
 @property (nonatomic, strong, nullable) CXCallController *callKeepCallController;
