@@ -8,5 +8,5 @@
 - (BOOL)application:(UIApplication * _Nullable)application
     continueUserActivity:(NSUserActivity * _Nullable)userActivity
       restorationHandler:(void (^  __nullable)(NSArray *_Nullable))restorationHandler;
-- (void)setAudioRouteToSpeaker:(BOOL)toSpeaker;
+- (void)toggleSpeaker:(BOOL)speakerOn;
 @end

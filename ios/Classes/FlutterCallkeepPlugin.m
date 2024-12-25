@@ -87,13 +87,12 @@ static id _instance;
     NSString *method = call.method;
     NSDictionary *argsMap = call.arguments;
 
-    // Check if we want to handle a specific method ourselves
-    if ([method isEqualToString:@"setAudioRouteToSpeaker"]) {
-        BOOL toSpeaker = [argsMap[@"toSpeaker"] boolValue];
-        [self setAudioRouteToSpeaker:toSpeaker];
+    if ([method isEqualToString:@"toggleSpeaker"]) {
+        BOOL speakerOn = [argsMap[@"speakerOn"] boolValue];
+        [_callKeep toggleSpeaker:speakerOn];
         result(nil);
     } else {
-        // If not recognized here, let CallKeep handle it
+        // If not recognized here, let CallKeep handle it (setup, startCall, etc.)
         if (![_callKeep handleMethodCall:call result:result]) {
             result(FlutterMethodNotImplemented);
         }
@@ -103,8 +102,8 @@ static id _instance;
 /**
  * Toggle speaker or earpiece on iOS by calling the method in CallKeep.m
  */
-- (void)setAudioRouteToSpeaker:(BOOL)toSpeaker {
-    [_callKeep setAudioRouteToSpeaker:toSpeaker];
+- (void)toggleSpeaker:(BOOL)speakerOn {
+    [_callKeep toggleSpeaker:speakerOn];
 }
 
 /**

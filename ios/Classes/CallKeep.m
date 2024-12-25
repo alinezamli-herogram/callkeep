@@ -119,6 +119,10 @@ static NSObject<CallKeepPushDelegate>* _delegate;
         BOOL toSpeaker = [argsMap[@"toSpeaker"] boolValue];
         [self setAudioRouteToSpeaker:toSpeaker];
         result(nil);
+    } else if ([method isEqualToString:@"toggleSpeaker"]) {
+        BOOL speakerOn = [args[@"speakerOn"] boolValue];
+        [self toggleSpeaker:speakerOn];
+        result(nil);
     } else {
         return NO;
     }
@@ -941,32 +945,37 @@ continueUserActivity:(NSUserActivity *)userActivity
     [[NSNotificationCenter defaultCenter] postNotificationName:AVAudioSessionInterruptionNotification object:nil userInfo:userInfo];
 }
 
-- (void)setAudioRouteToSpeaker:(BOOL)toSpeaker {
+
+- (void)toggleSpeaker:(BOOL)speakerOn {
+    // If you want to let the user manually choose in the CallKit UI,
+    // you should NOT do this override every time. This is purely optional.
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     NSError *error = nil;
-    
+
+    // Must be set to PlayAndRecord with AllowBluetooth for the route picker to function
     [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
                   withOptions:AVAudioSessionCategoryOptionAllowBluetooth
                         error:&error];
     if (error) {
-        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error setting category: %@", error);
+        NSLog(@"[toggleSpeaker] Error setting category: %@", error);
         return;
     }
-    
-    if (toSpeaker) {
+
+    if (speakerOn) {
         [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+        NSLog(@"[toggleSpeaker] Forcing Speaker ON");
     } else {
         [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+        NSLog(@"[toggleSpeaker] Forcing Speaker OFF (earpiece)");
     }
-    
     if (error) {
-        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error overriding audio port: %@", error);
+        NSLog(@"[toggleSpeaker] Error overriding audio port: %@", error);
     }
-    
+
+    // Activate the session
     [audioSession setActive:YES error:&error];
-    
     if (error) {
-        NSLog(@"[CallKeep][setAudioRouteToSpeaker] Error activating audio session: %@", error);
+        NSLog(@"[toggleSpeaker] Error activating session: %@", error);
     }
 }
 

@@ -440,9 +440,9 @@ class FlutterCallkeep extends EventManager {
   }
 
   /// Toggle audio route between speaker and earpiece.
-  Future<void> setAudioRouteToSpeaker(bool toSpeaker) async {
-    return _channel.invokeMethod('setAudioRouteToSpeaker', {
-      'toSpeaker': toSpeaker,
+  static Future<void> toggleSpeaker(bool speakerOn) async {
+    await _channel.invokeMethod('toggleSpeaker', {
+      'speakerOn': speakerOn,
     });
   }
 }
