@@ -70,4 +70,6 @@ continueUserActivity:(NSUserActivity * _Nonnull)userActivity
 
 + (BOOL)isCallActive:(NSString * _Nonnull)uuidString;
 
+- (void)setAudioRouteToSpeaker:(BOOL)toSpeaker;
+
 @end
